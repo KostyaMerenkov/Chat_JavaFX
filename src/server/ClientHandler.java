@@ -1,5 +1,8 @@
 package server;
 
+import client.Controller;
+
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,6 +40,7 @@ public class ClientHandler {
                                 sendMsg("/authok " + nickname);
                                 server.subscribe(this);
                                 System.out.println("Клиент " + nickname + " подключился");
+                                server.broadcastServerMsg("Клиент " + nickname + " подключился");
                                 break;
                             } else {
                                 sendMsg("Неверный логин / пароль");
@@ -48,17 +52,22 @@ public class ClientHandler {
                     while (true) {
                         String str = in.readUTF();
 
-                        if (str.equals("/end")) {
+                        if (str.equals("/help")) {
+                            sendMsg(server.getHELP());
+                        } else if (str.equals("/end")) {
                             out.writeUTF("/end");
                             break;
+                        } else if (str.startsWith("/w")) {
+                            server.sendByNickname(this, str);
+                        } else {
+                            server.broadcastMsg(this, str);
                         }
-
-                        server.broadcastMsg(this, str);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
                     System.out.println("Клиент отключился");
+                    server.broadcastServerMsg("Клиент " + nickname + " отключился!");
                     server.unsubscribe(this);
                     try {
                         socket.close();

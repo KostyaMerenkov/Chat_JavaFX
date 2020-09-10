@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import server.ClientHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,6 +52,7 @@ public class Controller implements Initializable {
 
         if (!authenticated) {
             nickname = "";
+            textArea.clear();
         }
         setTitle(nickname);
     }
@@ -77,6 +79,7 @@ public class Controller implements Initializable {
                             if (str.startsWith("/authok")) {
                                 nickname = str.split(" ", 2)[1];
                                 setAuthenticated(true);
+                                textArea.clear();
                                 break;
                             }
 
@@ -89,9 +92,12 @@ public class Controller implements Initializable {
 
                             if (str.equals("/end")) {
                                 break;
+                            } else if (str.startsWith("/w")) {
+                                textArea.appendText(str.split(" ",3)[2] + "\n");
+                            } else {
+                                textArea.appendText(str + "\n");
                             }
 
-                            textArea.appendText(str + "\n");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -142,4 +148,5 @@ public class Controller implements Initializable {
             ((Stage)textField.getScene().getWindow()).setTitle(TITLE +" "+ nick);
         });
     }
+
 }
