@@ -1,9 +1,11 @@
 package server;
 
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
     private Server server;
@@ -23,7 +25,7 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
-//                    socket.setSoTimeout(5000);
+                       socket.setSoTimeout(5000);
                     //цикл аутентификации
                     while (true) {
                         String str = in.readUTF();
@@ -39,6 +41,7 @@ public class ClientHandler {
                             login = token[1];
                             if (newNick != null) {
                                 if (!server.isLoginAuthenticated(login)) {
+                                    socket.setSoTimeout(0);
                                     nickname = newNick;
                                     sendMsg("/authok " + nickname);
                                     server.subscribe(this);
@@ -91,7 +94,8 @@ public class ClientHandler {
                         }
                     }
 
-                    //SocketTimeoutException
+                } catch (SocketTimeoutException e) {
+                    sendMsg("/inactive");
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
