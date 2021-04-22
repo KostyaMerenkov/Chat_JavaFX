@@ -69,7 +69,7 @@ public class Controller implements Initializable {
         if (!authenticated) {
             nickname = "";
         }
-        textArea.clear();
+
         setTitle(nickname);
 
     }
@@ -122,10 +122,14 @@ public class Controller implements Initializable {
                             if (str.startsWith("/regno")) {
                                 regController.addMsgToTextArea("Регистрация не получилась \n возможно логин или ник заняты");
                             }
+                            if (str.startsWith("/inactive")) {
+                                textArea.appendText("Вы были отсоединены от сервера из-за неактивности");
+                            } else {
+                                textArea.appendText(str + "\n");
+                            }
 
-                            textArea.appendText(str + "\n");
                         }
-
+                        textArea.clear();
                         //цикл работы
                         while (true) {
                             String str = in.readUTF();
@@ -142,6 +146,9 @@ public class Controller implements Initializable {
                                             clientList.getItems().add(token[i]);
                                         }
                                     });
+                                }
+                                if (str.equals("/inactive")) {
+                                    break;
                                 }
                             } else {
                                 textArea.appendText(str + "\n");
